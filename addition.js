@@ -16,14 +16,27 @@ const promiseAdd = (a, b) => {
   });
 };
 
-//implement the sum function using promiseAdd to add 2 number
+//implement the sum function using promiseAdd to add 2 number, optimize the calculate time by adding pairs of numbers at the same time
 const sum = async (...args) => {
-  let result = 0;
-  for (let num of args) {
-    result = await promiseAdd(result, num);
+  if (args.length === 1) {
+    return args[0];
+  }
+  if (args.length === 2) {
+    return await promiseAdd(args[0], args[1]);
   }
 
-  return result;
+  const promiseArr = [];
+
+  for (let i = 0; i < args.length - 1; i += 2) {
+    promiseArr.push(promiseAdd(args[i], args[i + 1]));
+  }
+
+  const newArgs = await Promise.all(promiseArr);
+  if (args.length % 2 === 1) {
+    newArgs.push(args[args.length - 1]);
+  }
+
+  return await sum(...newArgs);
 };
 
 (async () => {
